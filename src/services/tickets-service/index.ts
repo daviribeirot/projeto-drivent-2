@@ -10,25 +10,34 @@ async function getAllTicketsByType() {
   return result;
 }
 
-async function getAllTickets(userId: number) {
+async function getAllUserTickets(userId: number) {
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+
   if (!enrollment) throw notFoundError();
 
-  const ticket = await ticketRepository.findTicketByUserId(enrollment.id);
+  const result = await ticketRepository.findTicketByEnrollmentId(enrollment.id);
 
-  if (!ticket) throw notFoundError();
+  if (!result) throw notFoundError();
 
-  return ticket;
+  return result;
 }
 
-async function getTicketByUserId(userId: number) {
-  return console.log('oi');
+async function create(userId: number, ticketTypeId: number) {
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+
+  if (!enrollment) throw notFoundError();
+
+  const data = await ticketRepository.createTicket(enrollment.id, ticketTypeId);
+
+  if (!data) throw notFoundError();
+
+  return data;
 }
 
 const ticketService = {
-  getAllTickets,
-  getTicketByUserId,
+  getAllUserTickets,
   getAllTicketsByType,
+  create,
 };
 
 export default ticketService;
